@@ -102,15 +102,56 @@ ApplicationWindow {
         Item {
             anchors.fill: parent
             enabled: gameboy.running && stateController.state === "loaded"
+
+            ColumnLayout {
+                anchors.bottom: gameboyContainer.bottom
+                anchors.right: gameboyContainer.left
+                anchors.rightMargin: 20
+                width: 150
+                Clickable {
+                    text: "1x"
+                    onClicked: gameboyContainer.scale = 1
+                    border: 1
+                    Layout.fillWidth: true
+                }
+                Clickable {
+                    text: "2x"
+                    onClicked: gameboyContainer.scale = 2
+                    border: 1
+                    Layout.fillWidth: true
+                }
+                Clickable {
+                    text: "3x"
+                    onClicked: gameboyContainer.scale = 3
+                    border: 1
+                    Layout.fillWidth: true
+                }
+                Clickable {
+                    text: "4x"
+                    onClicked: gameboyContainer.scale = 4
+                    border: 1
+                    Layout.fillWidth: true
+                }
+                Clickable {
+                    text: "5x"
+                    onClicked: gameboyContainer.scale = 5
+                    border: 1
+                    Layout.fillWidth: true
+                }
+            }
+
             Rectangle {
                 id: gameboyContainer
                 anchors.centerIn: parent
-                color: "grey"
-                width: 160 * 4
-                height: 144 * 4
+                color: "black"
+                property int scale: 5
+                width: 160 * 5
+                height: 144 * 5
                 Gameboy {
                     id: gameboy
-                    anchors.fill: parent
+                    anchors.centerIn: parent
+                    width: 160 * parent.scale
+                    height: 144 * parent.scale
 
                     Keys.onPressed: (event)=> {
                         gameboy.keyDown(event.key);
@@ -120,8 +161,9 @@ ApplicationWindow {
                     }
                 }
             }
+
             ColumnLayout {
-                anchors.top: gameboyContainer.top
+                anchors.bottom: gameboyContainer.bottom
                 anchors.left: gameboyContainer.right
                 anchors.leftMargin: 20
                 width: 150
@@ -207,6 +249,7 @@ ApplicationWindow {
                 radius: 10
                 anchors.bottom: buttonSelect.bottom
                 anchors.left: buttonSelect.right
+                anchors.leftMargin: 20
                 onPressed: gameboy.keyDown(Qt.Key_Return)
                 onReleased: gameboy.keyUp(Qt.Key_Return)
             }
@@ -219,7 +262,7 @@ ApplicationWindow {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 50
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.horizontalCenterOffset: -(buttonSelect.width / 2)
+                anchors.horizontalCenterOffset: -(buttonSelect.width / 2) - (buttonStart.anchors.leftMargin / 2)
                 onPressed: gameboy.keyDown(Qt.Key_Space)
                 onReleased: gameboy.keyUp(Qt.Key_Space)
             }
