@@ -10,14 +10,19 @@ Label {
     property int radius: 0
     property string borderColor: "black"
     property string backgroundColor: "transparent"
+    property alias propagateComposedEvents: mouseArea.propagateComposedEvents
     signal pressed()
     signal released()
     signal clicked()
+    signal doubleClicked()
     MouseArea {
+        id: mouseArea
         anchors.fill: parent
         onPressed: root.pressed()
         onReleased: root.released()
         onClicked: root.clicked()
+        onDoubleClicked: root.doubleClicked();
+        scrollGestureEnabled: false
     }
     background: Rectangle{
         border.width: root.border

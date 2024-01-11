@@ -15,6 +15,7 @@ CONFIG += qtquickcompiler
 CONFIG += qmltypes
 
 QML_IMPORT_NAME = codes.eeems.gameboy
+QML_IMPOrt_PATH += .
 QML_IMPORT_MAJOR_VERSION = 1
 
 DEFINES += QT_DEPRECATED_WARNINGS
@@ -39,8 +40,10 @@ CONFIG(debug, debug|release){
     }
 }
 
-# This makes sure that libraries installed by toltec can be loaded by the application
-QMAKE_RPATHDIR += /lib /usr/lib /opt/lib /opt/usr/lib
+linux-oe-g++ {
+    # This makes sure that libraries installed by toltec can be loaded by the application
+    QMAKE_RPATHDIR += /lib /usr/lib /opt/lib /opt/usr/lib
+}
 
 # This allows you to use APP_VERSION in your code to output the application version
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
@@ -50,26 +53,30 @@ QMAKE_CFLAGS += -fPIC
 QMAKE_CXXFLAGS += -fPIC
 
 # The application will be installed to /opt/bin on the device
-target.path = /opt/bin
+linux-oe-g++ {
+    target.path = /opt/bin
+} else {
+    target.path = /usr/bin
+}
 INSTALLS += target
+linux-oe-g++ {
+    # This installs the oxide application registration file
+    applications.files = $$_PRO_FILE_PWD_/gameboy.oxide
+    applications.path = /opt/usr/share/applications/
+    INSTALLS += applications
 
-# This installs the oxide application registration file
-applications.files = $$_PRO_FILE_PWD_/gameboy.oxide
-applications.path = /opt/usr/share/applications/
-INSTALLS += applications
+    # This installs the application icon
+    # icons.files += $$_PRO_FILE_PWD_/gameboy.png
+    # icons.path = /opt/usr/share/icons/oxide/48x48/apps
+    # INSTALLS += icons
 
-# This installs the application icon
-# icons.files += $$_PRO_FILE_PWD_/gameboy.png
-# icons.path = /opt/usr/share/icons/oxide/48x48/apps
-# INSTALLS += icons
-
-# this installs the application splashscreen
-# splash.files += $$_PRO_FILE_PWD_/splash.png
-# splash.path = /opt/usr/share/icons/oxide/702x702/splash
-# INSTALLS += splash
+    # this installs the application splashscreen
+    # splash.files += $$_PRO_FILE_PWD_/splash.png
+    # splash.path = /opt/usr/share/icons/oxide/702x702/splash
+    # INSTALLS += splash
+}
 
 HEADERS += \
-    controller.h \
     gameboy.h \
     gameboythread.h
 

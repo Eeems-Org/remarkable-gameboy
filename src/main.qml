@@ -9,10 +9,10 @@ ApplicationWindow {
     id: window
     objectName: "window"
     visible: stateController.state !== "loading"
-    width: screenGeometry.width
-    height: screenGeometry.height
+    width: Screen.width
+    height: Screen.height
     title: Qt.application.displayName
-    Component.onCompleted: { controller.startup(); }
+    Component.onCompleted: stateController.state = "loaded"
     header: Rectangle {
         color: "black"
         height: menu.height
@@ -26,6 +26,7 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft
                 Clickable {
+                    id: backButton
                     text: stateController.state === "picker" ? "⬅️" : "Exit"
                     color: "white"
                     topPadding: 5
@@ -50,27 +51,15 @@ ApplicationWindow {
                 Item { Layout.fillWidth: true; }
             }
             RowLayout {
-                id: centerMenu
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignCenter
-                Item { Layout.fillWidth: true; }
-                Label {
-                    id: title
-                    color: "white"
-                    text: stateController.state === "picker" ? "Select a ROM" : window.title
-                }
-                Item { Layout.fillWidth: true; }
-            }
-            RowLayout {
                 id: rightMenu
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignRight
                 Item { Layout.fillWidth: true; }
                 Clickable {
+                    id: openButton
                     text: "Open"
-                    enabled: !gameboy.running
                     visible: stateController.state === "loaded"
-                    color: enabled ? "white" : "black"
+                    color: "white"
                     topPadding: 5
                     bottomPadding: 5
                     leftPadding: 10
@@ -78,8 +67,9 @@ ApplicationWindow {
                     onClicked: stateController.state = "picker"
                 }
                 Clickable {
-                    text: "Load"
-                    enabled: picker.selectedIndex !== -1
+                    id: loadButton
+                    text: picker.currentIndex > 0 && picker.get(picker.currentIndex, "fileIsDir") ? "Open" : "Load"
+                    enabled: picker.currentIndex > 0
                     visible: stateController.state === "picker"
                     color: enabled ? "white" : "black"
                     topPadding: 5
@@ -87,10 +77,28 @@ ApplicationWindow {
                     leftPadding: 10
                     rightPadding: 10
                     onClicked: {
-                        gameboy.loadROM(picker.selected())
-                        stateController.state = "loaded"
+                        if(picker.currentIndex == -1){
+                            return;
+                        }
+                        if(picker.get(picker.currentIndex, "fileIsDir")){
+                            picker.folder = picker.get(picker.currentIndex, "fileUrl");
+                            console.log(picker.folder);
+                            return;
+                        }
+                        gameboy.loadROM(picker.get(picker.currentIndex, "filePath"));
+                        stateController.state = "loaded";
                     }
                 }
+            }
+        }
+        RowLayout {
+            id: centerMenu
+            anchors.centerIn: parent
+            Layout.alignment: Qt.AlignCenter
+            Label {
+                id: title
+                color: "white"
+                text: stateController.state === "picker" ? "Select a ROM" : window.title
             }
         }
     }
@@ -147,18 +155,15 @@ ApplicationWindow {
                 property int scale: 5
                 width: 160 * 5
                 height: 144 * 5
+                activeFocusOnTab: true
                 Gameboy {
                     id: gameboy
                     anchors.centerIn: parent
                     width: 160 * parent.scale
                     height: 144 * parent.scale
-
-                    Keys.onPressed: (event)=> {
-                        gameboy.keyDown(event.key);
-                    }
-                    Keys.onReleased: (event)=> {
-                        gameboy.keyUp(event.key);
-                    }
+                    focus: true
+                    Keys.onPressed: (event)=> gameboy.keyDown(event.key)
+                    Keys.onReleased: (event)=> gameboy.keyUp(event.key)
                 }
             }
 
@@ -167,21 +172,28 @@ ApplicationWindow {
                 anchors.left: gameboyContainer.right
                 anchors.leftMargin: 20
                 width: 150
+
                 Clickable {
+                    id: stopButton
+                    text: "Stop"
+                    onClicked: gameboy.stop()
+                    border: 1
+                    Layout.fillWidth: true
+                }
+                Item { Layout.fillWidth: true; Layout.preferredHeight: stopButton.height }
+                Clickable {
+                    id: toggleButton
                     text: gameboy.paused ? "Resume" : "Pause"
                     onClicked: gameboy.toggle()
                     border: 1
                     Layout.fillWidth: true
                 }
                 Clickable {
-                    text: "Stop"
-                    onClicked: gameboy.stop()
-                    border: 1
-                    Layout.fillWidth: true
-                }
-                Clickable {
+                    id: toggleSpeedButton
                     text: "⏩"
-                    enabled: !gameboy.paused
+                    color: gameboy.slowedDown ? "black" : "white"
+                    backgroundColor: gameboy.slowedDown ? "white" : "black"
+                    enabled: gameboy.running
                     onClicked: gameboy.toggleSpeed()
                     border: 1
                     Layout.fillWidth: true
@@ -299,6 +311,9 @@ ApplicationWindow {
             id: picker
             visible: stateController.state === "picker"
             anchors.fill: parent
+            rootFolder: gameboy.homeFolder
+            folder: gameboy.romsFolder
+            onItemDoubleClicked: loadButton.clicked()
         }
 
     ]
@@ -317,6 +332,7 @@ ApplicationWindow {
                 SequentialAnimation {
                     ScriptAction { script: {
                         console.log("Display loaded");
+                        gameboy.forceActiveFocus();
                     } }
                 }
             },
@@ -325,7 +341,6 @@ ApplicationWindow {
                 SequentialAnimation {
                     ScriptAction { script: {
                         console.log("Loading display");
-                        controller.startup();
                     } }
                 }
             },
@@ -334,10 +349,38 @@ ApplicationWindow {
                 SequentialAnimation {
                     ScriptAction { script: {
                         console.log("Showing file picker");
-                        picker.selectedIndex = -1
+                        picker.currentIndex = -1;
+                        picker.forceActiveFocus();
                     } }
                 }
             }
         ]
+    }
+    Shortcut {
+        sequence: StandardKey.Quit
+        context: Qt.ApplicationShortcut
+        autoRepeat: false
+        onActivated: {
+            console.log("Quitting");
+            Qt.quit();
+        }
+    }
+    Shortcut {
+        enabled: stateController.state !== "loading"
+        sequences: [StandardKey.Cancel, Qt.Key_Backspace]
+        autoRepeat: false
+        onActivated: backButton.clicked()
+    }
+    Shortcut {
+        enabled: stateController.state === "loaded"
+        sequences: [StandardKey.Open]
+        autoRepeat: false
+        onActivated: stateController.state = "picker"
+    }
+    Shortcut {
+        enabled: stateController.state === "loaded"
+        sequences: [StandardKey.Refresh]
+        autoRepeat: false
+        onActivated: gameboy.reset()
     }
 }

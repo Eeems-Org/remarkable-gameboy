@@ -5,8 +5,10 @@ TEMPLATE = lib
 
 DEFINES += LIBQBOY_LIBRARY
 
-CONFIG -= debug
-CONFIG += release
+linux-oe-g++ {
+    CONFIG -= debug
+    CONFIG += release
+}
 
 SOURCES += libqboy.cpp \
     z80.cpp \
@@ -29,5 +31,9 @@ HEADERS += libqboy.h\
     z80timer.h \
     z80mbc.h
 
-target.path = /opt/usr/lib
+linux-oe-g++ {
+    target.path = /opt/usr/lib
+}else{
+    target.path = /usr/lib
+}
 INSTALLS += target

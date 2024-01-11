@@ -5,6 +5,9 @@
 #include <QImage>
 #include <QDebug>
 #include <QTimer>
+#include <QAbstractEventDispatcher>
+#include <QWaitCondition>
+#include <QMutex>
 
 #include <chrono>
 #include <libqboy.h>
@@ -13,19 +16,15 @@ using ms_t = std::chrono::milliseconds;
 
 class GameboyThread : public QThread{
     Q_OBJECT
+    Q_PROPERTY(bool slowedDown READ slowedDown NOTIFY slowedDownChanged REVISION 1)
 
 public:
     explicit GameboyThread(QObject* parent = 0)
     : QThread(parent),
       slowdown(true),
-      pauseRequested(false),
-      thirds(0)
+      pauseRequested(false)
     {
         qboy = new libqboy();
-        timer = new QTimer();
-        timer->moveToThread(this);
-        timer->setSingleShot(true);
-        connect(timer, &QTimer::timeout, this, &GameboyThread::cycle);
     }
     ~GameboyThread(){
         stop();
@@ -41,24 +40,36 @@ public:
         }
         qboy->reset();
         qboy->loadgame(path.toStdString());
+        currentROM = path;
         start();
         return true;
     }
+    void reset(){
+        if(!currentROM.isEmpty()){
+            loadROM(currentROM);
+        }
+    }
     void toggle(){
+        mutex.lock();
+        condition.notify_all();
         if(pauseRequested){
             pauseRequested = false;
             emit resumed();
-            schedule(0);
         }else{
             pauseRequested = true;
             emit paused();
         }
+        mutex.unlock();
     }
-    void toggleSpeed(){ slowdown = !slowdown; }
+    void toggleSpeed(){
+        slowdown = !slowdown;
+        emit slowedDownChanged(slowdown);
+    }
     void stop(){
         if(!isRunning()){
             return;
         }
+        requestInterruption();
         quit();
         while(isRunning()){}
     }
@@ -78,53 +89,55 @@ public:
             qboy->keyup(key);
         }
     }
+    bool slowedDown(){ return slowdown; }
 
 signals:
     void updated();
     void paused();
     void resumed();
+    void slowedDownChanged(bool);
 
 protected:
     void run(){
         qDebug() << "Starting emulation";
         pauseRequested = false;
-        thirds = 0;
-        lastFrame = std::chrono::steady_clock::now();
-        schedule(0);
-        exec();
-        qDebug() << "Stopping emulation";
-    }
-    void schedule(int ms){
-        timer->setInterval(ms);
-        QMetaObject::invokeMethod(timer, "start", Qt::QueuedConnection, Q_ARG(int, 0));
-    }
-
-private slots:
-    void cycle(){
-        while(!pauseRequested){
+        int thirds = 0;
+        auto lastFrame = std::chrono::steady_clock::now();;
+        while(!isInterruptionRequested()){
+            if(pauseRequested){
+                mutex.lock();
+                condition.wait(&mutex);
+                mutex.unlock();
+            }
             qboy->cycle();
-            if(qboy->refresh_screen()){
-                auto now = std::chrono::steady_clock::now();
-                int diff = std::chrono::duration_cast<ms_t>(now - lastFrame).count();
-                lastFrame = now;
-                emit updated();
-                if(thirds++ == 3){
-                    thirds = 0;
-                    diff--;
-                }
-                schedule(slowdown && 16 - diff > 0 ? 16 - diff : 0);
-                return;
+            if(!qboy->refresh_screen()){
+                continue;
+            }
+            auto now = std::chrono::steady_clock::now();
+            int diff = std::chrono::duration_cast<ms_t>(now - lastFrame).count();
+            lastFrame = now;
+            emit updated();
+            if(!slowdown){
+                continue;
+            }
+            if(thirds++ == 3){
+                thirds = 0;
+                diff--;
+            }
+            if(16 - diff > 0){
+                msleep(16 - diff);
             }
         }
+        qDebug() << "Stopping emulation";
     }
 
 private:
     libqboy* qboy;
-    QTimer* timer;
+    QMutex mutex;
+    QWaitCondition condition;
     bool slowdown;
     bool pauseRequested;
-    int thirds;
-    std::chrono::time_point<std::chrono::steady_clock> lastFrame;
+    QString currentROM;
 
     GBKeypadKey qtkeytogb(int keycode) {
         switch (keycode) {
