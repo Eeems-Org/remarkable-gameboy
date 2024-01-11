@@ -32,12 +32,14 @@ public:
         delete qboy;
     }
     bool loadROM(QString path){
+        stop();
         qDebug() << "Loading ROM:" << path;
         QFile file(path);
         if(!file.exists()){
             qDebug() << "Path does not exist!";
             return false;
         }
+        qboy->reset();
         qboy->loadgame(path.toStdString());
         start();
         return true;
@@ -46,6 +48,7 @@ public:
         if(pauseRequested){
             pauseRequested = false;
             emit resumed();
+            schedule(0);
         }else{
             pauseRequested = true;
             emit paused();
@@ -61,6 +64,20 @@ public:
     }
     QImage* getImage(){ return new QImage(qboy->getLCD(), 160, 144, QImage::Format_RGB32); }
     bool isPaused(){ return isRunning() && pauseRequested; }
+    void keyDown(int keycode){
+        GBKeypadKey key = qtkeytogb(keycode);
+        if(key != GBKeypadKey_NONE){
+            qDebug() << "Down" << key;
+            qboy->keydown(key);
+        }
+    }
+    void keyUp(int keycode){
+        GBKeypadKey key = qtkeytogb(keycode);
+        if(key != GBKeypadKey_NONE){
+            qDebug() << "Up" << key;
+            qboy->keyup(key);
+        }
+    }
 
 signals:
     void updated();
@@ -84,7 +101,7 @@ protected:
 
 private slots:
     void cycle(){
-        while(true){
+        while(!pauseRequested){
             qboy->cycle();
             if(qboy->refresh_screen()){
                 auto now = std::chrono::steady_clock::now();
@@ -108,4 +125,27 @@ private:
     bool pauseRequested;
     int thirds;
     std::chrono::time_point<std::chrono::steady_clock> lastFrame;
+
+    GBKeypadKey qtkeytogb(int keycode) {
+        switch (keycode) {
+            case Qt::Key_Return:
+                return GBKeypadKey_START;
+            case Qt::Key_Space:
+                return GBKeypadKey_SELECT;
+            case Qt::Key_Left:
+                return GBKeypadKey_LEFT;
+            case Qt::Key_Right:
+                return GBKeypadKey_RIGHT;
+            case Qt::Key_Down:
+                return GBKeypadKey_DOWN;
+            case Qt::Key_Up:
+                return GBKeypadKey_UP;
+            case Qt::Key_X:
+                return GBKeypadKey_B;
+            case Qt::Key_Z:
+                return GBKeypadKey_A;
+            default:
+                return GBKeypadKey_NONE;
+        }
+    }
 };

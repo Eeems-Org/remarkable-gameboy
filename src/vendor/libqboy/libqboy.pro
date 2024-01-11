@@ -1,10 +1,4 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2013-03-12T15:51:17
-#
-#-------------------------------------------------
-
-QT       -= gui
+QT -= gui
 
 TARGET = qboy
 TEMPLATE = lib
@@ -35,11 +29,5 @@ HEADERS += libqboy.h\
     z80timer.h \
     z80mbc.h
 
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}
+target.path = /opt/usr/lib
+INSTALLS += target
