@@ -16,7 +16,7 @@ build() {
         | xargs -r -0 sed -i 's/linux-oe-g++/linux-arm-remarkable-g++/g'
     qmake
     make -j$(nproc)
-    INSTALL_ROOT="dist" make install
+    INSTALL_ROOT="${srcdir}/dist" make install
 }
 
 package() {

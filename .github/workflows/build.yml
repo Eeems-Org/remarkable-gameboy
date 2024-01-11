@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Create source tarball
-        run: tar -czvf src.tar.gz src
+        run: tar -czvf src.tar.gz src gameboy.pro
       - name: Build package
         uses: toltec-dev/build-action@v1
       - name: Save packages
