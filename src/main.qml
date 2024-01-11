@@ -192,9 +192,9 @@ ApplicationWindow {
                 border: 1
                 radius: width / 2
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: 20
+                anchors.bottomMargin: 100
                 anchors.left: parent.left
-                anchors.leftMargin: 20 + buttonLeft.width
+                anchors.leftMargin: 100 + buttonLeft.width
                 onPressed: gameboy.keyDown(Qt.Key_Down)
                 onReleased: gameboy.keyUp(Qt.Key_Down)
             }
@@ -207,7 +207,6 @@ ApplicationWindow {
                 radius: 10
                 anchors.bottom: buttonSelect.bottom
                 anchors.left: buttonSelect.right
-                anchors.leftMargin: 20
                 onPressed: gameboy.keyDown(Qt.Key_Return)
                 onReleased: gameboy.keyUp(Qt.Key_Return)
             }
@@ -218,7 +217,7 @@ ApplicationWindow {
                 border: 1
                 radius: 10
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: 20
+                anchors.bottomMargin: 50
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.horizontalCenterOffset: -(buttonSelect.width / 2)
                 onPressed: gameboy.keyDown(Qt.Key_Space)
