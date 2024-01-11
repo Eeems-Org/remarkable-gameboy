@@ -40,7 +40,7 @@ jobs:
             set -ex
             echo Y | toltecctl generate-opkg-conf
             opkg update
-            opkg install my-app
+            opkg install gameboy
             # Add steps here to test app
-            opkg remove my-app
+            opkg remove gameboy
           path: ${{ steps.download.outputs.download-path }}
