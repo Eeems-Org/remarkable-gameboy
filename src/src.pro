@@ -1,5 +1,5 @@
 # Change this to rename the built application
-TARGET = myapp
+TARGET = gameboy
 VERSION = 1.0
 
 QT += gui
@@ -12,6 +12,10 @@ CONFIG += c++20
 CONFIG += c++latest
 CONFIG += qml_debug
 CONFIG += qtquickcompiler
+CONFIG += qmltypes
+
+QML_IMPORT_NAME = codes.eeems.gameboy
+QML_IMPORT_MAJOR_VERSION = 1
 
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x051510
@@ -50,12 +54,12 @@ target.path = /opt/bin
 INSTALLS += target
 
 # This installs the oxide application registration file
-applications.files = $$_PRO_FILE_PWD_/myapp.oxide
+applications.files = $$_PRO_FILE_PWD_/gameboy.oxide
 applications.path = /opt/usr/share/applications/
 INSTALLS += applications
 
 # This installs the application icon
-# icons.files += $$_PRO_FILE_PWD_/myapp.png
+# icons.files += $$_PRO_FILE_PWD_/gameboy.png
 # icons.path = /opt/usr/share/icons/oxide/48x48/apps
 # INSTALLS += icons
 
@@ -65,9 +69,12 @@ INSTALLS += applications
 # INSTALLS += splash
 
 HEADERS += \
-    controller.h
+    controller.h \
+    gameboy.h \
+    gameboythread.h
 
 RESOURCES += \
     qml.qrc
 
 include(vendor/epaper.pri)
+include(vendor/libqboy.pri)

@@ -1,10 +1,10 @@
-pkgnames=(my-app)
-pkgdesc="An example application package"
-url=https://example.com
+pkgnames=(gameboy)
+pkgdesc="Gameboy emulator for the reMarkable tablet"
+url=https://github.com/Eeems-Org/remarkable-gameboy
 pkgver=0.0.1-1
-timestamp=2020-10-09T18:15Z
-section=util
-maintainer="My Name <me@example.com>"
+timestamp=2024-01-11T02:25Z
+section=games
+maintainer="Eeems <eeems@eeems.email>"
 license=MIT
 
 image=qt:v3.1

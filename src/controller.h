@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QQuickItem>
 #include <epframebuffer.h>
+#include <libqboy.h>
 /*!
  * \brief This class serves as a simple interop between QML and C++
  */

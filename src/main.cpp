@@ -50,8 +50,8 @@ int main(int argc, char *argv[]){
      }
 
     QGuiApplication app(argc, argv);
-    app.setApplicationName("myapp");
-    app.setApplicationDisplayName("My Application");
+    app.setApplicationName("gameboy");
+    app.setApplicationDisplayName("Gameboy Emulator");
     app.setApplicationVersion(APP_VERSION);
     Controller controller(&app);
     QQmlApplicationEngine engine;
