@@ -39,6 +39,8 @@ INSTALL_ROOT="$(pwd)/../dist" make install
 cd ..
 ```
 
+If you skip out on the toolchain, you can also build this to run locally on your computer.
+
 Build toltec package
 ====================
 
