@@ -225,7 +225,7 @@ void gbgpu::postprocessram() {
     }
 
     if (lcdstat || updated) {
-        quint8 int_flags = mmu->readbyte(0xFF0F);
+        quint8 int_flags = mmu->readbyte_zram(0xFF0F);
         int_flags |= (lcdstat ? 0x2 : 0) | (updated ? 0x1 : 0);
         mmu->writebyte_zram(0xFF0F, int_flags);
     }
@@ -252,16 +252,16 @@ void gbgpu::drawbackground() {
 
         quint16 tileaddress = 0;
         if (tileset1()) {
-            quint8 tilenr = mmu->readbyte(mapbase + tiley * 32 + tilex);
+            quint8 tilenr = mmu->readbyte_vram(mapbase + tiley * 32 + tilex);
             tileaddress = 0x8000 + tilenr * 16;
         } else {
             // Signed!
-            qint8 tilenr = mmu->readbyte(mapbase + tiley * 32 + tilex);
+            qint8 tilenr = mmu->readbyte_vram(mapbase + tiley * 32 + tilex);
             tileaddress = 0x9000 + tilenr * 16;
         }
 
-        quint8 byte1 = mmu->readbyte(tileaddress + ((bgy & 0x07) * 2));
-        quint8 byte2 = mmu->readbyte(tileaddress + ((bgy & 0x07) * 2) + 1);
+        quint8 byte1 = mmu->readbyte_vram(tileaddress + ((bgy & 0x07) * 2));
+        quint8 byte2 = mmu->readbyte_vram(tileaddress + ((bgy & 0x07) * 2) + 1);
 
         quint8 xbit = bgx & 0x07;
         quint8 colnr = 0;
@@ -290,16 +290,16 @@ void gbgpu::drawwindow() {
 
         quint16 tileaddress = 0;
         if (tileset1()) {
-            quint8 tilenr = mmu->readbyte(mapbase + tiley * 32 + tilex);
+            quint8 tilenr = mmu->readbyte_vram(mapbase + tiley * 32 + tilex);
             tileaddress = 0x8000 + tilenr * 16;
         } else {
             // Signed!
-            qint8 tilenr = static_cast<qint8>(mmu->readbyte(mapbase + tiley * 32 + tilex));
+            qint8 tilenr = static_cast<qint8>(mmu->readbyte_vram(mapbase + tiley * 32 + tilex));
             tileaddress = 0x9000 + tilenr * 16;
         }
 
-        quint8 byte1 = mmu->readbyte(tileaddress + ((winy & 0x07) * 2));
-        quint8 byte2 = mmu->readbyte(tileaddress + ((winy & 0x07) * 2) + 1);
+        quint8 byte1 = mmu->readbyte_vram(tileaddress + ((winy & 0x07) * 2));
+        quint8 byte2 = mmu->readbyte_vram(tileaddress + ((winy & 0x07) * 2) + 1);
 
         quint8 xbit = winx % 8;
         quint8 colnr = 0;
@@ -325,10 +325,10 @@ void gbgpu::drawsprites() {
     for (int i = 0; i < 40; ++i) {
         quint16 spriteaddr = _GBGPU_VOAMBASE + i*4;
 
-        spritey[i] = mmu->readbyte(spriteaddr + 0) - 16;
-        spritex[i] = mmu->readbyte(spriteaddr + 1) - 8;
-        spritetile[i] = mmu->readbyte(spriteaddr + 2) & (spriteheight == 16 ? 0xFE : 0xFF);
-        spriteflags[i].byte = mmu->readbyte(spriteaddr + 3);
+        spritey[i] = mmu->readbyte_voam(spriteaddr + 0) - 16;
+        spritex[i] = mmu->readbyte_voam(spriteaddr + 1) - 8;
+        spritetile[i] = mmu->readbyte_voam(spriteaddr + 2) & (spriteheight == 16 ? 0xFE : 0xFF);
+        spriteflags[i].byte = mmu->readbyte_voam(spriteaddr + 3);
 
         if (line >= spritey[i] && line < spritey[i] + spriteheight)
             numsprites++;
@@ -350,8 +350,8 @@ void gbgpu::drawsprites() {
             tiley = (spriteheight - 1) - tiley;
 
         quint16 tileaddress = 0x8000 + spritetile[i] * 16 + tiley * 2;
-        quint8 byte1 = mmu->readbyte(tileaddress);
-        quint8 byte2 = mmu->readbyte(tileaddress + 1);
+        quint8 byte1 = mmu->readbyte_vram(tileaddress);
+        quint8 byte2 = mmu->readbyte_vram(tileaddress + 1);
 
         for (int x = 0; x < 8; ++x) {
             if (spritex[i] + x < 0 || spritex[i] + x >= _GBGPU_W)
