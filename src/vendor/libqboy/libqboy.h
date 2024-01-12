@@ -13,21 +13,21 @@
 
 class LIBQBOYSHARED_EXPORT libqboy {
 public:
-	libqboy();
-	void reset();
-	quint8 *getLCD();
-	void loadgame(std::string filename);
-	void cycle();
-	bool refresh_screen();
-	int get_elapsed_time();
-	void keyup(GBKeypadKey key);
-	void keydown(GBKeypadKey key);
+    libqboy();
+    void reset();
+    quint8 *getLCD();
+    void loadgame(std::string filename);
+    void cycle();
+    bool refresh_screen();
+    int get_elapsed_time();
+    void keyup(GBKeypadKey key);
+    void keydown(GBKeypadKey key);
 private:
-	z80 cpu;
-	z80mmu mmu;
-	z80timer timer;
-	gbgpu gpu;
-	gbkeypad keypad;
+    z80 cpu;
+    z80mmu mmu;
+    z80timer timer;
+    gbgpu gpu;
+    gbkeypad keypad;
 };
 
 #endif // LIBQBOY_H
