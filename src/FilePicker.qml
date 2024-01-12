@@ -42,7 +42,7 @@ Item {
     Component {
         id: fileDelegate
         Clickable {
-            visible: fileName != "."
+            visible: fileName !== "."
             text: fileName !== ".." ? fileName + (fileIsDir ? "/" : "") : "(Parent Directory)"
             width: {
                 if(parent == undefined){

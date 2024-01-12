@@ -115,7 +115,6 @@ ApplicationWindow {
 
             ColumnLayout {
                 id: speedButtons
-                enabled: gameboy.running
                 anchors.bottom: {
                     if(gameboyContainer.bottom < buttonUp.top){
                         return gameboyContainer.bottom
@@ -130,7 +129,7 @@ ApplicationWindow {
                 }
                 anchors.right: gameboyContainer.left
                 anchors.rightMargin: 20
-                width: 150
+                width: 180
                 Clickable {
                     text: "1x"
                     onClicked: gameboyContainer.scale = 1
@@ -165,6 +164,14 @@ ApplicationWindow {
                     border: 1
                     Layout.fillWidth: true
                     backgroundColor: "white"
+                }
+                Clickable {
+                    text: gameboy.greyscale ? "Greyscale" : "B&W"
+                    color: "black"
+                    backgroundColor: gameboy.greyscale ? "grey" : "white"
+                    onClicked: gameboy.greyscale = !gameboy.greyscale
+                    border: 1
+                    Layout.fillWidth: true
                 }
             }
 
@@ -203,7 +210,7 @@ ApplicationWindow {
                 }
                 anchors.left: gameboyContainer.right
                 anchors.leftMargin: 20
-                width: 150
+                width: speedButtons.width
 
                 Clickable {
                     id: stopButton
@@ -407,6 +414,9 @@ ApplicationWindow {
                 from: "*"; to: "picker"
                 SequentialAnimation {
                     ScriptAction { script: {
+                        if(gameboy.running && !gameboy.paused){
+                            gameboy.toggle();
+                        }
                         console.log("Showing file picker");
                         picker.currentIndex = -1;
                         picker.forceActiveFocus();

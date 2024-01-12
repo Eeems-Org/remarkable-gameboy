@@ -113,7 +113,7 @@ protected:
         qDebug() << "Starting emulation";
         pauseRequested = false;
         int thirds = 0;
-        auto lastFrame = std::chrono::steady_clock::now();;
+        auto lastFrame = std::chrono::steady_clock::now();
         while(!isInterruptionRequested()){
             if(pauseRequested){
                 mutex.lock();
