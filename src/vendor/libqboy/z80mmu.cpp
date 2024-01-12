@@ -89,7 +89,7 @@ quint8 z80mmu::readbyte(quint16 address) {
 
     // VRAM
     case 0x8000: case 0x9000:
-        return vram[address & 0x1FFF];
+        return readbyte_vram(address);
 
     // External RAM
     case 0xA000: case 0xB000:
@@ -97,7 +97,7 @@ quint8 z80mmu::readbyte(quint16 address) {
 
     // Work RAM and echo
     case 0xC000: case 0xD000: case 0xE000:
-        return wram[address & 0x1FFF];
+        return readbyte_wram(address);
 
     // Everything else
     case 0xF000:
@@ -107,15 +107,15 @@ quint8 z80mmu::readbyte(quint16 address) {
         case 0x400: case 0x500: case 0x600: case 0x700:
         case 0x800: case 0x900: case 0xA00: case 0xB00:
         case 0xC00: case 0xD00:
-            return wram[address & 0x1FFF];
+            return readbyte_wram(address);
 
         // OAM
         case 0xE00:
-            return address < 0xFEA0 ? voam[address & 0xFF] : 0;
+            return readbyte_voam(address);
 
         // Zeropage RAM, I/O
         case 0xF00:
-            return zram[address & 0xFF];
+            return readbyte_zram(address);
 
         }
     }
@@ -148,7 +148,7 @@ void z80mmu::writebyte(quint16 address, quint8 value) {
 
     // VRAM
     case 0x8000: case 0x9000:
-        vram[address & 0x1FFF] = value;
+        writebyte_vram(address, value);
         break;
 
     // External RAM
@@ -158,7 +158,7 @@ void z80mmu::writebyte(quint16 address, quint8 value) {
 
     // Work RAM and echo
     case 0xC000: case 0xD000: case 0xE000:
-        wram[address & 0x1FFF] = value;
+        writebyte_wram(address, value);
         break;
 
     // Everything else
@@ -169,17 +169,17 @@ void z80mmu::writebyte(quint16 address, quint8 value) {
         case 0x400: case 0x500: case 0x600: case 0x700:
         case 0x800: case 0x900: case 0xA00: case 0xB00:
         case 0xC00: case 0xD00:
-            wram[address & 0x1FFF] = value;
+            writebyte_wram(address, value);
             break;
 
         // OAM
         case 0xE00:
-            if(address < 0xFEA0) voam[address & 0xFF] = value;
+            writebyte_voam(address, value);
             break;
 
         // Zeropage RAM, I/O
         case 0xF00:
-            zram[address & 0xFF] = value;
+            writebyte_zram(address, value);
             break;
         }
 

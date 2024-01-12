@@ -156,16 +156,16 @@ void gbgpu::preprocessram() {
     quint8 newregisters[_GBGPU_VREGSIZE] = {0};
 
     for (int i = 0; i < _GBGPU_VREGSIZE; ++i) {
-        newregisters[i] = mmu->readbyte(_GBGPU_VREGBASE + i);
+        newregisters[i] = mmu->readbyte_zram(_GBGPU_VREGBASE + i);
     }
 
     if (newregisters[6] != 0) {
         quint16 baseaddr = newregisters[6];
         baseaddr <<= 8;
         for(quint8 i = 0; i < 0xA0; ++i) {
-            mmu->writebyte(_GBGPU_VOAMBASE + i, mmu->readbyte(baseaddr + i));
+            mmu->writebyte_voam(_GBGPU_VOAMBASE + i, mmu->readbyte(baseaddr + i));
         }
-        mmu->writebyte(_GBGPU_VREGBASE + 6, 0);
+        mmu->writebyte_zram(_GBGPU_VREGBASE + 6, 0);
     }
 
     if (newregisters[7] != registers[7]) {
@@ -206,13 +206,13 @@ void gbgpu::preprocessram() {
 }
 
 void gbgpu::postprocessram() {
-    mmu->writebyte(_GBGPU_VREGBASE + 4, line);
+    mmu->writebyte_zram(_GBGPU_VREGBASE + 4, line);
 
     quint8 vreg1 = registers[1];
     vreg1 &= 0xF8;
     vreg1 |= (line == linecmp() ? 4 : 0) | (mode & 0x3);
 
-    mmu->writebyte(_GBGPU_VREGBASE + 1, vreg1);
+    mmu->writebyte_zram(_GBGPU_VREGBASE + 1, vreg1);
 
     bool lcdstat = false;
     if (line != oldline) {
@@ -227,7 +227,7 @@ void gbgpu::postprocessram() {
     if (lcdstat || updated) {
         quint8 int_flags = mmu->readbyte(0xFF0F);
         int_flags |= (lcdstat ? 0x2 : 0) | (updated ? 0x1 : 0);
-        mmu->writebyte(0xFF0F, int_flags);
+        mmu->writebyte_zram(0xFF0F, int_flags);
     }
 }
 

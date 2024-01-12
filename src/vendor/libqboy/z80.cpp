@@ -57,8 +57,8 @@ bool z80::is_halted() {
 bool z80::handle_interrupt() {
     if (interrupt_enable == false && halted == false) return false;
 
-    quint8 interrupt_occured = mmu->readbyte(0xFF0F);
-    quint8 interrupt_enabled = mmu->readbyte(0xFFFF);
+    quint8 interrupt_occured = mmu->readbyte_zram(0xFF0F);
+    quint8 interrupt_enabled = mmu->readbyte_zram(0xFFFF);
 
     if((interrupt_occured & interrupt_enabled & 0x1F) == 0){
         return false;
@@ -68,7 +68,7 @@ bool z80::handle_interrupt() {
         if ((interrupt_occured & interrupt_enabled & (1u << i)) != 0) {
             halted = false;
             if (interrupt_enable) {
-                mmu->writebyte(0xFF0F, interrupt_occured & ~(1u << i));
+                mmu->writebyte_zram(0xFF0F, interrupt_occured & ~(1u << i));
                 op_rst_int(0x0040 | (i << 3));
                 return true;
             }

@@ -13,10 +13,10 @@ void z80timer::step(int z80m) {
     bool interrupt = false;
     quint8 divider, counter, modulo, control;
 
-    divider = mmu->readbyte(0xFF04);
-    counter = mmu->readbyte(0xFF05);
-    modulo = mmu->readbyte(0xFF06);
-    control = mmu->readbyte(0xFF07);
+    divider = mmu->readbyte_zram(0xFF04);
+    counter = mmu->readbyte_zram(0xFF05);
+    modulo = mmu->readbyte_zram(0xFF06);
+    control = mmu->readbyte_zram(0xFF07);
 
     int step = 0;
     switch (control & 0x3) {
@@ -49,11 +49,11 @@ void z80timer::step(int z80m) {
         }
     }
 
-    mmu->writebyte(0xFF04, divider);
-    mmu->writebyte(0xFF05, counter);
-    mmu->writebyte(0xFF06, modulo);
+    mmu->writebyte_zram(0xFF04, divider);
+    mmu->writebyte_zram(0xFF05, counter);
+    mmu->writebyte_zram(0xFF06, modulo);
 
     if (interrupt) {
-        mmu->writebyte(0xFF0F, mmu->readbyte(0xFF0F) | 0x04);
+        mmu->writebyte_zram(0xFF0F, mmu->readbyte_zram(0xFF0F) | 0x04);
     }
 }

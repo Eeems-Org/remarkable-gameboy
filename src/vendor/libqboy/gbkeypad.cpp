@@ -6,14 +6,14 @@ gbkeypad::gbkeypad(z80mmu *mmu) {
 }
 
 void gbkeypad::step() {
-    quint8 mem = mmu->readbyte(_GBKEYPAD_MEMADDR);
+    quint8 mem = mmu->readbyte_zram(_GBKEYPAD_MEMADDR);
     mem &= 0x30;
     if (mem & 0x10) mem |= row0;
     if (mem & 0x20) mem |= row1;
-    mmu->writebyte(_GBKEYPAD_MEMADDR, mem);
+    mmu->writebyte_zram(_GBKEYPAD_MEMADDR, mem);
 
     if (interrupt) {
-        mmu->writebyte(0xFF0F, mmu->readbyte(0xFF0F) | 0x10);
+        mmu->writebyte_zram(0xFF0F, mmu->readbyte_zram(0xFF0F) | 0x10);
     }
     interrupt = false;
 }
