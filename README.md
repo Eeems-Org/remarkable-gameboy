@@ -1,17 +1,27 @@
 [![rm1](https://img.shields.io/badge/rM1-supported-green)](https://remarkable.com/store/remarkable) [![rm2](https://img.shields.io/badge/rM2-supported-green)](https://remarkable.com/store/remarkable-2) [![Discord](https://img.shields.io/discord/385916768696139794.svg?label=reMarkable&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/ATqQGfu)
 
-reMarkable Template Qt Application
-==================================
+reMarkable Gameboy Emulator
+===========================
 
-- [src/vendor/epaper/epframebuffer.h](src/vendor/epaper/epframebuffer.h) - Methods for direct access to the reMarkable screen.
-- [src/vendor/epaper/libqsgepaper.a](src/vendor/epaper/libqsgepaper.a) - Static library that contains the epaper Qt platform. This is required for Qt to be able to interact with the screen on the reMarkable.
-- [src/vendor/epaper.pri](src/vendor/epaper.pri) - Include file used by [src/src.pro](src/src.pro) to allow the application to access the epaper Qt platform.
-- [src/controller.h](src/controller.h) - Basic controller object that provides an interop between QML and C++.
-- [src/main.cpp](src/main.cpp) - Main application code.
-- [src/main.qml](src/main.qml) - Main user interface.
-- [src/myapp.oxide](src/myapp.oxide) - [Oxide application registration](https://oxide.eeems.codes/documentation/03_application_registration_format.html)
-- [src/qml.qrc](src/qml.qrc) - Qt resource file to embed [src/main.qml](src/main.qml) in the built application.
-- [src/src.pro](src/src.pro) - Project file. This defines the build and install process.
+A proof-of-concept emulator for the reMarkable tablet built on [libqboy](https://github.com/mvdnes/qboy).
+
+Features
+--------
+
+- Loading saved games
+- ROM selection screen
+- Greyscale or B&W screen
+- Screen scaling selection, 1x to 5x
+- Keyboard shortcuts that work with the folio
+  - X: B
+  - Z: A
+  - Space: Select
+  - Enter/Return: Start
+  - Arrow Keys: Arrow buttons
+  - Ctrl-O: Open new ROM
+  - Ctrl-R: Reset emulator
+  - Esc/Backspace: Press the back arrow
+  - Ctrl-Q: Quit the application
 
 Building
 ========
@@ -35,6 +45,6 @@ Build toltec package
 https://remarkable.guide/devel/package.html
 
 ```bash
-tar -czvf src.tar.gz src
+tar -czvf src.tar.gz src gameboy.pro
 toltecmk
 ```
