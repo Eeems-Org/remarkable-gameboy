@@ -3,7 +3,6 @@
 
 #include "libqboy_global.h"
 #include "z80mmu.h"
-#include <vector>
 
 const int _GBGPU_W = 160;
 const int _GBGPU_H = 144;

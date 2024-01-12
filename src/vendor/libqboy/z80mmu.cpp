@@ -5,6 +5,10 @@
 
 z80mmu::z80mmu() {
     mbc = 0;
+    wram.resize(0x2000, 0);
+    vram.resize(0x2000, 0);
+    voam.resize(0xA0, 0);
+    zram.resize(0x100, 0);
     reset();
 }
 
@@ -13,10 +17,10 @@ z80mmu::~z80mmu() {
 }
 
 void z80mmu::reset() {
-    wram.resize(0x2000, 0);
-    vram.resize(0x2000, 0);
-    voam.resize(0xA0, 0);
-    zram.resize(0x100, 0);
+    std::fill(wram.begin(), wram.end(), 0);
+    std::fill(vram.begin(), vram.end(), 0);
+    std::fill(voam.begin(), voam.end(), 0);
+    std::fill(zram.begin(), zram.end(), 0);
     if (mbc != 0) delete mbc;
     mbc = 0;
 
