@@ -12,7 +12,7 @@ source=(src.tar.gz)
 sha256sums=(SKIP)
 
 build() {
-    find . -name "*.pro" -type f -print0 \
+    find . -type f -name "*.pro" -o -name "*.pri" -print0 \
         | xargs -r -0 sed -i 's/linux-oe-g++/linux-arm-remarkable-g++/g'
     qmake
     make -j$(nproc)
