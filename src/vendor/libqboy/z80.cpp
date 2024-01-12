@@ -60,6 +60,10 @@ bool z80::handle_interrupt() {
     quint8 interrupt_occured = mmu->readbyte(0xFF0F);
     quint8 interrupt_enabled = mmu->readbyte(0xFFFF);
 
+    if((interrupt_occured & interrupt_enabled & 0x1F) == 0){
+        return false;
+    }
+
     for (unsigned int i = 0; i < 5; ++i) {
         if ((interrupt_occured & interrupt_enabled & (1u << i)) != 0) {
             halted = false;
@@ -71,7 +75,6 @@ bool z80::handle_interrupt() {
             return false;
         }
     }
-
     return false;
 }
 
@@ -152,13 +155,13 @@ void z80::addticks(int m) {
 bool z80::jumpcond(int arg) {
     switch (arg) {
     case 0:
-        return !af.getflag('z');
+        return !af.getflag(z);
     case 1:
-        return af.getflag('z');
+        return af.getflag(z);
     case 2:
-        return !af.getflag('c');
+        return !af.getflag(c);
     case 3:
-        return af.getflag('c');
+        return af.getflag(c);
     }
 
     assert(false && "Errornous jump condition");
@@ -607,7 +610,7 @@ void z80::op_rdca(Direction dir) {
         ans = alu.rrc(ans);
     }
     af.sethi(ans);
-    af.setflag('z', false);
+    af.setflag(z, false);
 
     addticks(1);
 }
@@ -620,7 +623,7 @@ void z80::op_rda(Direction dir) {
         ans = alu.rr(ans);
     }
     af.sethi(ans);
-    af.setflag('z', false);
+    af.setflag(z, false);
 
     addticks(1);
 }
@@ -734,9 +737,9 @@ void z80::op_bit(quint8 bit, int arg) {
         addticks(2);
     }
 
-    af.setflag('z', (ans & test) == 0);
-    af.setflag('n', false);
-    af.setflag('h', true);
+    af.setflag(z, (ans & test) == 0);
+    af.setflag(n, false);
+    af.setflag(h, true);
 }
 
 void z80::op_set(quint8 bit, int arg) {
@@ -923,10 +926,10 @@ void z80::op_swap(int arg) {
         addticks(2);
     }
 
-    af.setflag('z', ans == 0);
-    af.setflag('n', false);
-    af.setflag('h', false);
-    af.setflag('c', false);
+    af.setflag(z, ans == 0);
+    af.setflag(n, false);
+    af.setflag(h, false);
+    af.setflag(c, false);
 }
 
 void z80::op_daa() {

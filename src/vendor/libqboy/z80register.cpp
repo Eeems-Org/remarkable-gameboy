@@ -39,17 +39,6 @@ quint8 z80register::gethi() {
     return data.part.hi;
 }
 
-bool z80register::getflag(char type) {
-    int bit = getflagmask(type);
-    return data.part.lo & bit;
-}
-
-void z80register::setflag(char type, bool val) {
-    int bit = getflagmask(type);
-    if (val) data.part.lo |= bit;
-    else data.part.lo &= ~bit;
-}
-
 void z80register::operator+=(qint16 val) {
     data.full += val;
 }
@@ -57,14 +46,3 @@ void z80register::operator+=(qint16 val) {
 void z80register::operator-=(qint16 val) {
     data.full -= val;
 }
-
-int z80register::getflagmask(char type) {
-    switch (type) {
-    case 'c': return (1 << 4);
-    case 'h': return (1 << 5);
-    case 'n': return (1 << 6);
-    case 'z': return (1 << 7);
-    default: return 0;
-    }
-}
-

@@ -73,8 +73,12 @@ public:
             return;
         }
         requestInterruption();
+        if(pauseRequested){
+            toggle();
+        }
         quit();
         while(isRunning()){}
+        qboy->reset();
         emit updated();
     }
     QImage* getImage(){ return new QImage(qboy->getLCD(), 160, 144, QImage::Format_RGB32); }
