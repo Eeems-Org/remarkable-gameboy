@@ -1,4 +1,5 @@
 #include "gbgpu.h"
+#include <cstring>
 
 gbgpu::gbgpu(z80mmu *mmu) {
     this->mmu = mmu;
@@ -10,7 +11,7 @@ void gbgpu::reset() {
     modeclock = 0;
     line = 0;
     scanlinetransfered = false;
-    registers.resize(_GBGPU_VREGSIZE, 0);
+    std::fill(registers, registers+_GBGPU_VREGSIZE, 0);
 
     for (int i = 0; i < 4; ++i) {
         pallete_bg[i] = pallete_obj0[i] = pallete_obj1[i] = 255;
@@ -152,7 +153,7 @@ quint8 gbgpu::linecmp() {
 }
 
 void gbgpu::preprocessram() {
-    std::vector<quint8> newregisters(_GBGPU_VREGSIZE, 0);
+    quint8 newregisters[_GBGPU_VREGSIZE] = {0};
 
     for (int i = 0; i < _GBGPU_VREGSIZE; ++i) {
         newregisters[i] = mmu->readbyte(_GBGPU_VREGBASE + i);
@@ -199,8 +200,7 @@ void gbgpu::preprocessram() {
             }
         }
     }
-
-    registers = newregisters;
+    std::memcpy(&registers, &newregisters, _GBGPU_VREGSIZE);
     oldmode = mode;
     oldline = line;
 }

@@ -44,7 +44,7 @@ private:
     bool updated;
 
     quint8 pallete_bg[4], pallete_obj0[4], pallete_obj1[4];
-    std::vector<quint8> registers;
+    quint8 registers[_GBGPU_VREGSIZE];
 
     bool lcd_on();
     bool bg_on();
