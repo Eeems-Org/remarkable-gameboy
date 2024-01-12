@@ -153,6 +153,8 @@ quint8 gbgpu::linecmp() {
 }
 
 void gbgpu::preprocessram() {
+    // TODO - expose PPU registers and maintain them instead of
+    //        checking every single cycle
     quint8 newregisters[_GBGPU_VREGSIZE] = {0};
 
     for (int i = 0; i < _GBGPU_VREGSIZE; ++i) {
@@ -317,10 +319,10 @@ void gbgpu::drawsprites() {
     int spriteheight = sprite_large() ? 16 : 8;
 
     int numsprites = 0;
-    std::vector<int> spritey(40);
-    std::vector<int> spritex(40);
-    std::vector<int> spritetile(40);
-    std::vector<gbgpu_oamflags> spriteflags(40);
+    int spritey[40] = {0};
+    int spritex[40] = {0};
+    int spritetile[40] = {0};
+    gbgpu_oamflags spriteflags[40];
 
     for (int i = 0; i < 40; ++i) {
         quint16 spriteaddr = _GBGPU_VOAMBASE + i*4;
@@ -330,8 +332,9 @@ void gbgpu::drawsprites() {
         spritetile[i] = mmu->readbyte_voam(spriteaddr + 2) & (spriteheight == 16 ? 0xFE : 0xFF);
         spriteflags[i].byte = mmu->readbyte_voam(spriteaddr + 3);
 
-        if (line >= spritey[i] && line < spritey[i] + spriteheight)
+        if (line >= spritey[i] && line < spritey[i] + spriteheight) {
             numsprites++;
+        }
     }
 
 
