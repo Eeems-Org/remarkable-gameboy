@@ -11,7 +11,9 @@ ApplicationWindow {
     visible: stateController.state !== "loading"
     width: Screen.width
     height: Screen.height
-    title: Qt.application.displayName
+    minimumWidth: gameboyContainer.width + speedButtons.width + stateButtons.width + 50
+    minimumHeight: gameboyContainer.height + buttonSelect.height + 50
+    title: gameboy.running ? gameboy.romName : Qt.application.displayName
     Component.onCompleted: stateController.state = "loaded"
     header: Rectangle {
         color: "black"
@@ -109,10 +111,23 @@ ApplicationWindow {
         },
         Item {
             anchors.fill: parent
-            enabled: gameboy.running && stateController.state === "loaded"
+            enabled: stateController.state === "loaded"
 
             ColumnLayout {
-                anchors.bottom: gameboyContainer.bottom
+                id: speedButtons
+                enabled: gameboy.running
+                anchors.bottom: {
+                    if(gameboyContainer.bottom < buttonUp.top){
+                        return gameboyContainer.bottom
+                    }
+                    return buttonUp.top
+                }
+                anchors.bottomMargin: {
+                    if(gameboyContainer.bottom < buttonUp.top){
+                        return 0
+                    }
+                    return 20
+                }
                 anchors.right: gameboyContainer.left
                 anchors.rightMargin: 20
                 width: 150
@@ -121,30 +136,35 @@ ApplicationWindow {
                     onClicked: gameboyContainer.scale = 1
                     border: 1
                     Layout.fillWidth: true
+                    backgroundColor: "white"
                 }
                 Clickable {
                     text: "2x"
                     onClicked: gameboyContainer.scale = 2
                     border: 1
                     Layout.fillWidth: true
+                    backgroundColor: "white"
                 }
                 Clickable {
                     text: "3x"
                     onClicked: gameboyContainer.scale = 3
                     border: 1
                     Layout.fillWidth: true
+                    backgroundColor: "white"
                 }
                 Clickable {
                     text: "4x"
                     onClicked: gameboyContainer.scale = 4
                     border: 1
                     Layout.fillWidth: true
+                    backgroundColor: "white"
                 }
                 Clickable {
                     text: "5x"
                     onClicked: gameboyContainer.scale = 5
                     border: 1
                     Layout.fillWidth: true
+                    backgroundColor: "white"
                 }
             }
 
@@ -168,7 +188,19 @@ ApplicationWindow {
             }
 
             ColumnLayout {
-                anchors.bottom: gameboyContainer.bottom
+                id: stateButtons
+                anchors.bottom: {
+                    if(gameboyContainer.bottom < buttonA.top){
+                        return gameboyContainer.bottom
+                    }
+                    return buttonA.top
+                }
+                anchors.bottomMargin: {
+                    if(gameboyContainer.bottom < buttonA.top){
+                        return 0
+                    }
+                    return 20
+                }
                 anchors.left: gameboyContainer.right
                 anchors.leftMargin: 20
                 width: 150
@@ -176,32 +208,44 @@ ApplicationWindow {
                 Clickable {
                     id: stopButton
                     text: "Stop"
+                    enabled: gameboy.running
                     onClicked: gameboy.stop()
                     border: 1
                     Layout.fillWidth: true
+                    backgroundColor: "white"
                 }
-                Item { Layout.fillWidth: true; Layout.preferredHeight: stopButton.height }
+                Clickable {
+                    id: resetButton
+                    text: "Reset"
+                    enabled: gameboy.romName !== ""
+                    onClicked: gameboy.reset()
+                    border: 1
+                    Layout.fillWidth: true
+                    backgroundColor: "white"
+                }
                 Clickable {
                     id: toggleButton
+                    enabled: gameboy.running
                     text: gameboy.paused ? "Resume" : "Pause"
                     onClicked: gameboy.toggle()
                     border: 1
                     Layout.fillWidth: true
+                    backgroundColor: "white"
                 }
                 Clickable {
                     id: toggleSpeedButton
                     text: "⏩"
+                    enabled: gameboy.romName !== ""
                     color: gameboy.slowedDown ? "black" : "white"
                     backgroundColor: gameboy.slowedDown ? "white" : "black"
-                    enabled: gameboy.running
                     onClicked: gameboy.toggleSpeed()
                     border: 1
                     Layout.fillWidth: true
                 }
             }
-
             Clickable {
                 id: buttonLeft
+                enabled: gameboy.running
                 text: "←"
                 font.pointSize: 20
                 width: height
@@ -210,11 +254,13 @@ ApplicationWindow {
                 radius: width / 2
                 anchors.bottom: buttonDown.top
                 anchors.right: buttonDown.left
+                backgroundColor: "white"
                 onPressed: gameboy.keyDown(Qt.Key_Left)
                 onReleased: gameboy.keyUp(Qt.Key_Left)
             }
             Clickable {
                 id: buttonUp
+                enabled: gameboy.running
                 text: "↑"
                 font.pointSize: 20
                 width: height
@@ -222,11 +268,13 @@ ApplicationWindow {
                 radius: width / 2
                 anchors.bottom: buttonLeft.top
                 anchors.left: buttonDown.left
+                backgroundColor: "white"
                 onPressed: gameboy.keyDown(Qt.Key_Up)
                 onReleased: gameboy.keyUp(Qt.Key_Up)
             }
             Clickable {
                 id: buttonRight
+                enabled: gameboy.running
                 text: "→"
                 font.pointSize: 20
                 width: height
@@ -235,11 +283,13 @@ ApplicationWindow {
                 radius: width / 2
                 anchors.bottom: buttonDown.top
                 anchors.left: buttonDown.right
+                backgroundColor: "white"
                 onPressed: gameboy.keyDown(Qt.Key_Right)
                 onReleased: gameboy.keyUp(Qt.Key_Right)
             }
             Clickable {
                 id: buttonDown
+                enabled: gameboy.running
                 text: "↓"
                 font.pointSize: 20
                 width: height
@@ -248,6 +298,7 @@ ApplicationWindow {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 100
                 anchors.left: parent.left
+                backgroundColor: "white"
                 anchors.leftMargin: 100 + buttonLeft.width
                 onPressed: gameboy.keyDown(Qt.Key_Down)
                 onReleased: gameboy.keyUp(Qt.Key_Down)
@@ -255,6 +306,7 @@ ApplicationWindow {
 
             Clickable {
                 id: buttonStart
+                enabled: gameboy.running
                 text: "start"
                 font.pointSize: 15
                 border: 1
@@ -262,11 +314,13 @@ ApplicationWindow {
                 anchors.bottom: buttonSelect.bottom
                 anchors.left: buttonSelect.right
                 anchors.leftMargin: 20
+                backgroundColor: "white"
                 onPressed: gameboy.keyDown(Qt.Key_Return)
                 onReleased: gameboy.keyUp(Qt.Key_Return)
             }
             Clickable {
                 id: buttonSelect
+                enabled: gameboy.running
                 text: "select"
                 font.pointSize: 15
                 border: 1
@@ -275,12 +329,14 @@ ApplicationWindow {
                 anchors.bottomMargin: 50
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.horizontalCenterOffset: -(buttonSelect.width / 2) - (buttonStart.anchors.leftMargin / 2)
+                backgroundColor: "white"
                 onPressed: gameboy.keyDown(Qt.Key_Space)
                 onReleased: gameboy.keyUp(Qt.Key_Space)
             }
 
             Clickable {
                 id: buttonB
+                enabled: gameboy.running
                 text: "B"
                 font.pointSize: 20
                 border: 1
@@ -290,11 +346,13 @@ ApplicationWindow {
                 anchors.bottomMargin: 100
                 anchors.right: buttonA.left
                 anchors.rightMargin: 20
+                backgroundColor: "white"
                 onPressed: gameboy.keyDown(Qt.Key_X)
                 onReleased: gameboy.keyUp(Qt.Key_X)
             }
             Clickable {
                 id: buttonA
+                enabled: gameboy.running
                 text: "A"
                 font.pointSize: 20
                 border: 1
@@ -303,6 +361,7 @@ ApplicationWindow {
                 anchors.right: parent.right
                 anchors.rightMargin: 100
                 anchors.bottom: buttonB.top
+                backgroundColor: "white"
                 onPressed: gameboy.keyDown(Qt.Key_Z)
                 onReleased: gameboy.keyUp(Qt.Key_Z)
             }

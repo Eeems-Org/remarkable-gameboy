@@ -16,6 +16,7 @@ class Gameboy : public QQuickPaintedItem {
     Q_PROPERTY(bool slowedDown READ slowedDown NOTIFY slowedDownChanged REVISION 1)
     Q_PROPERTY(QString homeFolder READ homeFolder CONSTANT REVISION 1)
     Q_PROPERTY(QString romsFolder READ romsFolder CONSTANT REVISION 1)
+    Q_PROPERTY(QString romName READ romName NOTIFY romNameChanged REVISION 1)
     QML_NAMED_ELEMENT(Gameboy)
 
 public:
@@ -37,6 +38,7 @@ public:
         connect(thread, &GameboyThread::paused, this, [this]{ emit pausedChanged(true); }, Qt::QueuedConnection);
         connect(thread, &GameboyThread::resumed, this, [this]{ emit pausedChanged(false); }, Qt::QueuedConnection);
         connect(thread, &GameboyThread::slowedDownChanged, this, &Gameboy::slowedDownChanged, Qt::QueuedConnection);
+        connect(thread, &GameboyThread::romNameChanged, this, &Gameboy::romNameChanged, Qt::QueuedConnection);
     }
     ~Gameboy(){
         delete thread;
@@ -60,11 +62,13 @@ public:
         return QUrl::fromLocalFile(home.absoluteFilePath("roms")).toString();
     }
     bool slowedDown(){ return thread->slowedDown(); }
+    QString romName(){ return thread->romName(); }
 
 signals:
     void runningChanged(bool);
     void pausedChanged(bool);
     void slowedDownChanged(bool);
+    void romNameChanged(QString);
 
 protected:
     void paint(QPainter* painter){

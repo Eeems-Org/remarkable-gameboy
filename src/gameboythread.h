@@ -8,6 +8,7 @@
 #include <QAbstractEventDispatcher>
 #include <QWaitCondition>
 #include <QMutex>
+#include <QFileInfo>
 
 #include <chrono>
 #include <libqboy.h>
@@ -17,6 +18,7 @@ using ms_t = std::chrono::milliseconds;
 class GameboyThread : public QThread{
     Q_OBJECT
     Q_PROPERTY(bool slowedDown READ slowedDown NOTIFY slowedDownChanged REVISION 1)
+    Q_PROPERTY(QString romName READ romName NOTIFY romNameChanged REVISION 1)
 
 public:
     explicit GameboyThread(QObject* parent = 0)
@@ -41,6 +43,7 @@ public:
         qboy->reset();
         qboy->loadgame(path.toStdString());
         currentROM = path;
+        emit romNameChanged(romName());
         start();
         return true;
     }
@@ -72,6 +75,7 @@ public:
         requestInterruption();
         quit();
         while(isRunning()){}
+        emit updated();
     }
     QImage* getImage(){ return new QImage(qboy->getLCD(), 160, 144, QImage::Format_RGB32); }
     bool isPaused(){ return isRunning() && pauseRequested; }
@@ -90,12 +94,19 @@ public:
         }
     }
     bool slowedDown(){ return slowdown; }
+    QString romName(){
+        if(currentROM.isEmpty()){
+            return "";
+        }
+        return QFileInfo(currentROM).completeBaseName();
+    }
 
 signals:
     void updated();
     void paused();
     void resumed();
     void slowedDownChanged(bool);
+    void romNameChanged(QString);
 
 protected:
     void run(){
