@@ -13,6 +13,7 @@ CONFIG += c++latest
 CONFIG += qml_debug
 CONFIG += qtquickcompiler
 CONFIG += qmltypes
+QT += gui-private
 
 QML_IMPORT_NAME = codes.eeems.gameboy
 QML_IMPOrt_PATH += .

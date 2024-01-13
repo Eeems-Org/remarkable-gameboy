@@ -68,8 +68,6 @@ int main(int argc, char *argv[]){
         qDebug() << "Nothing to display";
         return -1;
     }
-    auto root = engine.rootObjects().first();
-    filter->root = (QQuickItem*)root;
 
     // Setup some signal handlers to make sure to quit the application normally if these signals are recieved
     signal(SIGINT, sigHandler);
