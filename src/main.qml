@@ -60,20 +60,6 @@ ApplicationWindow {
                             stateController.state = "loaded";
                         }
                     }
-                    Clickable {
-                        id: rotateButton
-                        text: gameboy.landscape ? "▭" : "▯"
-                        color: "white"
-                        topPadding: 5
-                        bottomPadding: 5
-                        leftPadding: 10
-                        rightPadding: 10
-                        onClicked: {
-                            gameboy.landscape = !gameboy.landscape;
-                            console.log(window.orientationWidth() + ", " + window.orientationHeight());
-                        }
-                    }
-
                     Item { Layout.fillWidth: true; }
                 }
                 RowLayout {
@@ -153,43 +139,56 @@ ApplicationWindow {
                     }
                     anchors.right: gameboyContainer.left
                     anchors.rightMargin: 20
-                    width: 180
+                    width: 190
                     Clickable {
                         text: "1x"
-                        onClicked: gameboyContainer.scale = 1
                         border: 1
                         Layout.fillWidth: true
                         backgroundColor: "white"
+                        onClicked: gameboyContainer.scale = 1
                     }
                     Clickable {
                         text: "2x"
-                        onClicked: gameboyContainer.scale = 2
                         border: 1
                         Layout.fillWidth: true
                         backgroundColor: "white"
+                        onClicked: gameboyContainer.scale = 2
                     }
                     Clickable {
                         text: "3x"
-                        onClicked: gameboyContainer.scale = 3
                         border: 1
                         Layout.fillWidth: true
                         backgroundColor: "white"
+                        onClicked: gameboyContainer.scale = 3
                     }
                     Clickable {
                         text: "4x"
-                        onClicked: gameboyContainer.scale = 4
                         border: 1
                         Layout.fillWidth: true
                         backgroundColor: "white"
+                        onClicked: gameboyContainer.scale = 4
                     }
                     Clickable {
                         text: "5x"
-                        onClicked: gameboyContainer.scale = 5
                         border: 1
                         Layout.fillWidth: true
                         backgroundColor: "white"
+                        onClicked: gameboyContainer.scale = 5
+                    }
+
+                    Clickable {
+                        id: rotateButton
+                        text: gameboy.landscape ? "Landscape" : "Portrait"
+                        border: 1
+                        Layout.fillWidth: true
+                        backgroundColor: "White"
+                        onClicked: {
+                            gameboy.landscape = !gameboy.landscape;
+                            console.log(window.orientationWidth() + ", " + window.orientationHeight());
+                        }
                     }
                     Clickable {
+                        id: greyscaleButton
                         text: gameboy.greyscale ? "Greyscale" : "B&W"
                         color: "black"
                         backgroundColor: gameboy.greyscale ? "grey" : "white"
