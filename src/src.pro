@@ -22,6 +22,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x051510
 
 SOURCES += \
+        eventfilter.cpp \
         main.cpp
 
 # This provides more context on crashes when built in debug mode
@@ -77,6 +78,7 @@ linux-oe-g++ {
 }
 
 HEADERS += \
+    eventfilter.h \
     gameboy.h \
     gameboythread.h
 

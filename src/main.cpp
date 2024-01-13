@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <signal.h>
 
+#include "eventfilter.h"
+
 #ifdef EPAPER
 // This is required for Qt to display to the reMarkable's display
 Q_IMPORT_PLUGIN(QsgEpaperPlugin)
@@ -53,6 +55,8 @@ int main(int argc, char *argv[]){
     qDebug() << "Desktop detected...";
 #endif
     QGuiApplication app(argc, argv);
+    auto filter = new EventFilter(&app);
+    app.installEventFilter(filter);
     app.setApplicationName("gameboy");
     app.setApplicationDisplayName("Gameboy Emulator");
     app.setApplicationVersion(APP_VERSION);
@@ -64,6 +68,8 @@ int main(int argc, char *argv[]){
         qDebug() << "Nothing to display";
         return -1;
     }
+    auto root = engine.rootObjects().first();
+    filter->root = (QQuickItem*)root;
 
     // Setup some signal handlers to make sure to quit the application normally if these signals are recieved
     signal(SIGINT, sigHandler);
