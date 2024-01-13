@@ -21,6 +21,7 @@ class Gameboy : public QQuickPaintedItem {
     Q_PROPERTY(bool paused READ paused NOTIFY pausedChanged REVISION 1)
     Q_PROPERTY(bool slowedDown READ slowedDown NOTIFY slowedDownChanged REVISION 1)
     Q_PROPERTY(bool greyscale READ isGreyscale WRITE setGreyscale NOTIFY greyscaleChanged REVISION 1)
+    Q_PROPERTY(bool landscape READ isLandscape WRITE setLandscape NOTIFY landscapeChanged REVISION 1)
     Q_PROPERTY(QString homeFolder READ homeFolder CONSTANT REVISION 1)
     Q_PROPERTY(QString romsFolder READ romsFolder CONSTANT REVISION 1)
     Q_PROPERTY(QString romName READ romName NOTIFY romNameChanged REVISION 1)
@@ -78,6 +79,11 @@ public:
         greyscale = value;
         emit greyscaleChanged(greyscale);
     }
+    bool isLandscape(){ return landscape; }
+    void setLandscape(bool value){
+        landscape = value;
+        emit landscapeChanged(landscape);
+    }
 
 signals:
     void runningChanged(bool);
@@ -85,6 +91,7 @@ signals:
     void slowedDownChanged(bool);
     void romNameChanged(QString);
     void greyscaleChanged(bool);
+    void landscapeChanged(bool);
 
 protected slots:
     void updated(){
@@ -92,7 +99,12 @@ protected slots:
 #ifdef EPAPER
         rect.moveCenter(screenCentre);
         QPainter painter(EPFrameBuffer::instance()->framebuffer());
-        painter.drawImage(rect, *image, image->rect());
+        QImage finalImage = landscape ? image->transformed(QTransform().rotate(90.0), Qt::FastTransformation) : *image;
+        painter.drawImage(
+            rect,
+            finalImage,
+            finalImage.rect()
+        );
         painter.end();
         EPFrameBuffer::sendUpdate(
             rect,
@@ -132,4 +144,5 @@ private:
     GameboyThread* thread;
     QPoint screenCentre;
     bool greyscale;
+    bool landscape;
 };
