@@ -41,7 +41,8 @@ quint8 z80mbc1::readROM(quint16 address) {
 }
 
 quint8 z80mbc1::readRAM(quint16 address) {
-    if (!extram_on || !ram_mode) return 0;
+    if (!extram_on) return 0;
+    if (!ram_mode) rambank = 0;
     address &= 0x1FFF;
     return ram[rambank * 0x2000 | address];
 }
@@ -75,7 +76,7 @@ void z80mbc1::writeROM(quint16 address, quint8 value) {
 }
 
 void z80mbc1::writeRAM(quint16 address, quint8 value) {
-    if (!extram_on || !ram_mode) return;
+    if (!extram_on) return;
     if (!ram_mode) rambank = 0;
     address &= 0x1FFF;
     ram[rambank * 0x2000 | address] = value;
