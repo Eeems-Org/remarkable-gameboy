@@ -459,7 +459,7 @@ ApplicationWindow {
         }
         Shortcut {
             enabled: stateController.state !== "loading"
-            sequences: [StandardKey.Cancel, Qt.Key_Backspace]
+            sequences: [StandardKey.Cancel, "Backspace"]
             autoRepeat: false
             onActivated: backButton.clicked()
         }
@@ -474,6 +474,32 @@ ApplicationWindow {
             sequences: [StandardKey.Refresh]
             autoRepeat: false
             onActivated: gameboy.reset()
+        }
+        Shortcut {
+            enabled: stateController.state === "loaded"
+            sequences: ["Ctrl-P", "MediaTogglePlayPause"]
+            autoRepeat: false
+            onActivated: gameboy.toggle()
+        }
+        Shortcut {
+            enabled: stateController.state === "loaded"
+            sequences: ["Pause", "MediaPause"]
+            autoRepeat: false
+            onActivated:{
+                if(gameboy.running && !gameboy.paused){
+                    gameboy.toggle();
+                }
+            }
+        }
+        Shortcut {
+            enabled: stateController.state === "loaded"
+            sequences: ["Play", "MediaPlay"]
+            autoRepeat: false
+            onActivated:{
+                if(gameboy.running && gameboy.paused){
+                    gameboy.toggle();
+                }
+            }
         }
     }
 }

@@ -64,7 +64,7 @@ int main(int argc, char *argv[]){
     // This is defined in qml.qrc
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-    if (engine.rootObjects().isEmpty()){
+    if(engine.rootObjects().isEmpty()){
         qDebug() << "Nothing to display";
         return -1;
     }
