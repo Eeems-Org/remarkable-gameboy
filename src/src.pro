@@ -24,6 +24,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x051510
 
 SOURCES += \
         eventfilter.cpp \
+        gameboy.cpp \
         main.cpp
 
 # This provides more context on crashes when built in debug mode
@@ -44,7 +45,7 @@ CONFIG(debug, debug|release){
 
 linux-oe-g++ {
     # This makes sure that libraries installed by toltec can be loaded by the application
-    QMAKE_RPATHDIR += /lib /usr/lib /opt/lib /opt/usr/lib
+    QMAKE_RPATHDIR += /lib /usr/lib /home/root/.vellum/lib
 }
 
 # This allows you to use APP_VERSION in your code to output the application version
@@ -54,9 +55,8 @@ QMAKE_LFLAGS += -flto
 QMAKE_CFLAGS += -fPIC
 QMAKE_CXXFLAGS += -fPIC
 
-# The application will be installed to /opt/bin on the device
 linux-oe-g++ {
-    target.path = /opt/bin
+    target.path = /home/root/.vellum/bin
 } else {
     target.path = /usr/bin
 }
@@ -64,7 +64,7 @@ INSTALLS += target
 linux-oe-g++ {
     # This installs the oxide application registration file
     applications.files = $$_PRO_FILE_PWD_/gameboy.oxide
-    applications.path = /opt/usr/share/applications/
+    applications.path = /home/root/.local/share/applications/
     INSTALLS += applications
 
     # This installs the application icon

@@ -3,7 +3,6 @@
     "description": "Gameboy emulator",
     "bin": "/opt/bin/gameboy",
     "icon": "oxide:gameboy-48",
-    "splash": "oxide:splash:gameboy-48",
     "type": "foreground",
     "flags": ["preload.qt"]
 }
