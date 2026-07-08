@@ -15,6 +15,7 @@ ApplicationWindow {
     width: Screen.width
     height: Screen.height
     title: gameboy.running ? gameboy.romName : Qt.application.displayName
+    font.pointSize: 24
     function orientationWidth(){ return gameboy.landscape ? height : width; }
     function orientationHeight(){ return gameboy.landscape ? width : height;  }
     Component.onCompleted: {stateController.state = "loaded"; console.log(window.orientationWidth() + ", " + window.orientationHeight());}

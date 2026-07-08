@@ -79,11 +79,7 @@ protected slots:
 protected:
   void paint(QPainter *painter);
 #ifndef EPAPER
-  QImage monoImage() {
-    return image->convertToFormat(
-        QImage::Format_Mono, Qt::MonoOnly | Qt::DiffuseDither |
-                                 Qt::DiffuseAlphaDither | Qt::PreferDither);
-  }
+  QImage monoImage();
 #endif
 
 private:
