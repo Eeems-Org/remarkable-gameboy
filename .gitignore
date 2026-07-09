@@ -3,3 +3,5 @@ dist/
 *.pro.user
 src.tar.gz
 build/
+src/vendor/oxide/*/
+src/vendor/oxide/.extracted

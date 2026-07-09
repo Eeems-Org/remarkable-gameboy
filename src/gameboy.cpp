@@ -2,10 +2,11 @@
 
 #ifdef EPAPER
 #include <epframebuffer.h>
+#include <liboxide/oxideqml.h>
 #endif
 
 Gameboy::Gameboy(QQuickItem *parent)
-    : QQuickPaintedItem(parent), greyscale(true), landscape{false} {
+    : QQuickPaintedItem(parent), greyscale(true) {
   image = nullptr;
   connect(this, &Gameboy::runningChanged, [this](bool) {
     if (running()) {
@@ -41,39 +42,37 @@ Gameboy::Gameboy(QQuickItem *parent)
 Gameboy::~Gameboy() { delete thread; }
 
 void Gameboy::updated() {
-  QRect rect = boundingRect().toRect();
 #ifdef EPAPER
-  rect.moveCenter(screenCentre);
-  auto *instance = EPFramebuffer::instance();
-  QPainter painter(&instance->frameBuffer);
-  QImage finalImage = landscape ? image->transformed(QTransform().rotate(90.0),
-                                                     Qt::FastTransformation)
-                                : *image;
-  painter.drawImage(rect, finalImage, finalImage.rect());
-  painter.end();
-  instance->swapBuffers(
-      rect, greyscale ? EPContentType::Color : EPContentType::Monochrome,
-      EPScreenMode::Animate, EPFramebuffer::UpdateFlag::PartialUpdate);
+  // Only send repaints every 16ms (~60fps)
+  if (m_LastPaint.elapsed() < 0.016) {
+    return;
+  }
+  auto windowImage = Oxide::QML::getImageForWindow(window());
+  auto rect = mapRectToScene(boundingRect());
+  {
+    QPainter painter(&windowImage);
+    painter.setClipRect(rect);
+    painter.drawImage(rect, greyscale ? *image : monoImage(), image->rect());
+  }
+  Oxide::QML::repaint(window(), rect, Blight::WaveformMode::Animate,
+                      greyscale ? Blight::ContentType::Color
+                                : Blight::ContentType::Monochrome,
+                      Blight::UpdateMode::PartialUpdate);
+  m_LastPaint.reset();
 #else
-  update(rect);
+  update(boundingRect().toRect());
 #endif
 }
 
 void Gameboy::paint(QPainter *painter) {
-#ifndef EPAPER
   if (image != nullptr) {
     painter->drawImage(boundingRect(), greyscale ? *image : monoImage(),
                        image->rect());
   }
-#else
-  Q_UNUSED(painter)
-#endif
 }
 
-#ifndef EPAPER
 QImage Gameboy::monoImage() {
   return image->convertToFormat(QImage::Format_Mono,
                                 Qt::MonoOnly | Qt::DiffuseDither |
                                     Qt::DiffuseAlphaDither | Qt::PreferDither);
 }
-#endif

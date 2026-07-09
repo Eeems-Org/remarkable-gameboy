@@ -1,9 +1,9 @@
-# Change this to rename the built application
 TARGET = gameboy
 VERSION = 1.0
 
 QT += gui
 QT += quick
+QT += dbus
 
 CONFIG += ltcg
 CONFIG += c++11
@@ -23,11 +23,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x051510
 
 SOURCES += \
-        eventfilter.cpp \
         gameboy.cpp \
         main.cpp
 
-# This provides more context on crashes when built in debug mode
 CONFIG(debug, debug|release){
     LIBS += -lunwind
     contains(DEFINES, SANITIZER){
@@ -44,11 +42,9 @@ CONFIG(debug, debug|release){
 }
 
 linux-oe-g++ {
-    # This makes sure that libraries installed by toltec can be loaded by the application
     QMAKE_RPATHDIR += /lib /usr/lib /home/root/.vellum/lib
 }
 
-# This allows you to use APP_VERSION in your code to output the application version
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 QMAKE_LFLAGS += -flto
@@ -62,29 +58,17 @@ linux-oe-g++ {
 }
 INSTALLS += target
 linux-oe-g++ {
-    # This installs the oxide application registration file
     applications.files = $$_PRO_FILE_PWD_/gameboy.oxide
     applications.path = /home/root/.local/share/applications/
     INSTALLS += applications
-
-    # This installs the application icon
-    # icons.files += $$_PRO_FILE_PWD_/gameboy.png
-    # icons.path = /opt/usr/share/icons/oxide/48x48/apps
-    # INSTALLS += icons
-
-    # this installs the application splashscreen
-    # splash.files += $$_PRO_FILE_PWD_/splash.png
-    # splash.path = /opt/usr/share/icons/oxide/702x702/splash
-    # INSTALLS += splash
 }
 
 HEADERS += \
-    eventfilter.h \
     gameboy.h \
     gameboythread.h
 
 RESOURCES += \
     qml.qrc
 
-include(vendor/epaper.pri)
+include(vendor/oxide.pri)
 include(vendor/libqboy.pri)

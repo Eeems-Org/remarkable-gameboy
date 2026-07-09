@@ -7,7 +7,12 @@
 #include <QQuickPaintedItem>
 #include <QSGSimpleRectNode>
 #include <QScreen>
+#include <QString>
 #include <QtQml/qqml.h>
+
+#ifdef EPAPER
+#include <libblight/clock.h>
+#endif
 
 #include "gameboythread.h"
 
@@ -19,8 +24,6 @@ class Gameboy : public QQuickPaintedItem {
       bool slowedDown READ slowedDown NOTIFY slowedDownChanged REVISION 1)
   Q_PROPERTY(bool greyscale READ isGreyscale WRITE setGreyscale NOTIFY
                  greyscaleChanged REVISION 1)
-  Q_PROPERTY(bool landscape READ isLandscape WRITE setLandscape NOTIFY
-                 landscapeChanged REVISION 1)
   Q_PROPERTY(QString homeFolder READ homeFolder CONSTANT REVISION 1)
   Q_PROPERTY(QString romsFolder READ romsFolder CONSTANT REVISION 1)
   Q_PROPERTY(QString romName READ romName NOTIFY romNameChanged REVISION 1)
@@ -59,11 +62,6 @@ public:
     greyscale = value;
     emit greyscaleChanged(greyscale);
   }
-  bool isLandscape() { return landscape; }
-  void setLandscape(bool value) {
-    landscape = value;
-    emit landscapeChanged(landscape);
-  }
 
 signals:
   void runningChanged(bool);
@@ -71,21 +69,18 @@ signals:
   void slowedDownChanged(bool);
   void romNameChanged(QString);
   void greyscaleChanged(bool);
-  void landscapeChanged(bool);
 
 protected slots:
   void updated();
 
 protected:
   void paint(QPainter *painter);
-#ifndef EPAPER
   QImage monoImage();
-#endif
 
 private:
   QImage *image;
   GameboyThread *thread;
   QPoint screenCentre;
   bool greyscale;
-  bool landscape;
+  Blight::ClockWatch m_LastPaint;
 };
